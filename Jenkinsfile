@@ -18,6 +18,10 @@ pipeline {
     environment {
         APP_NAME          = 'simple-docker-flask-app'
         DOCKER_IMAGE_NAME = 'moudle8848/ansible-deploy'
+
+        // ANSIBLE GITHUB REPOSITORY
+        ANSIBLE_REPO       = 'https://github.com/Kritesh2nd/docker-flask-ansible-project.git'
+        ANSIBLE_PROJECT_DIR = 'docker-flask-ansible-project'
     }
 
     stages {
@@ -141,7 +145,7 @@ pipeline {
             }
         }
 
-        // PUSH IMAGE TO DOCKER HUB        
+        // PUSH IMAGE TO DOCKER HUB
         stage('Push Docker Image') {
             steps {
                 echo 'Logging into Docker Hub...'
@@ -169,7 +173,7 @@ pipeline {
             }
         }
 
-        // DEPLOY THROUGH ANSIBLE        
+        // DEPLOY THROUGH ANSIBLE
         stage('Deploy via Ansible') {
             steps {
 
@@ -180,10 +184,22 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no \
                             ${params.ANSIBLE_CONTROLLER_USER}@${params.ANSIBLE_CONTROLLER_IP} '
-                                cd simple-docker-flask-app-ansible &&
+
+                                # CLONE ANSIBLE REPOSITORY IF IT DOES NOT EXIST
+                                if [ ! -d "${ANSIBLE_PROJECT_DIR}" ]; then
+                                    git clone ${ANSIBLE_REPO}
+                                fi
+
+                                # GO TO ANSIBLE PROJECT DIRECTORY
+                                cd ${ANSIBLE_PROJECT_DIR}
+
+                                # GET LATEST ANSIBLE CODE
+                                git pull origin main
+
+                                # RUN ANSIBLE DEPLOYMENT
                                 ansible-playbook deploy.yml \
-                                --extra-vars "docker_image=${DOCKER_IMAGE_NAME}" \
-                                --extra-vars "image_tag=${IMAGE_TAG}"
+                                    --extra-vars "docker_image=${DOCKER_IMAGE_NAME}" \
+                                    --extra-vars "image_tag=${IMAGE_TAG}"
                             '
                     """
                 }
