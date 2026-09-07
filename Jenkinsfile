@@ -197,7 +197,7 @@ pipeline {
                                 git pull origin main
 
                                 # RUN ANSIBLE DEPLOYMENT
-                                ansible-playbook deploy.yml \
+                                ansible-playbook ansible/deploy.yml \
                                     --extra-vars "docker_image=${DOCKER_IMAGE_NAME}" \
                                     --extra-vars "image_tag=${IMAGE_TAG}"
                             '
