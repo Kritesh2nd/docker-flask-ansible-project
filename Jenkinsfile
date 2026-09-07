@@ -54,9 +54,24 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 echo 'Logging into Docker Registry...'
-                sh 'echo "$DOCKER_CREDS_PSW" | docker login -u "$DOCKER_CREDS_USR" --password-stdin'
-                echo "Pushing image ${DOCKER_CREDS_USR}/${APP_NAME}:${IMAGE_TAG}..."
-                sh "docker push ${DOCKER_CREDS_USR}/${APP_NAME}:${IMAGE_TAG}"
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'docker-creds',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASSWORD" | docker login \
+                            -u "$DOCKER_USERNAME" \
+                            --password-stdin
+                    '''
+
+                    sh """
+                        docker push ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}
+                    """
+                }
             }
         }
         stage('Deploy via Ansible') {
