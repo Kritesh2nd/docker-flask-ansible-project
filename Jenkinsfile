@@ -63,17 +63,18 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        echo "$DOCKER_PASSWORD" | docker login \
-                            -u "$DOCKER_USERNAME" \
-                            --password-stdin
-                    '''
+                        set -e
 
-                    sh """
-                        docker push ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}
-                    """
+                        echo "$DOCKER_PASSWORD" | docker login \
+                            --username "$DOCKER_USERNAME" \
+                            --password-stdin
+
+                        docker push "${DOCKER_IMAGE_NAME}:${IMAGE_TAG}"
+                    '''
                 }
             }
         }
+        
         stage('Deploy via Ansible') {
             steps {
                 sshagent(credentials: ['ansible-ssh-key']) {
