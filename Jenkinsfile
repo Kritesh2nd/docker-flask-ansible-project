@@ -10,6 +10,7 @@ pipeline {
         APP_NAME     = 'simple-docker-flask-app'
         DOCKER_CREDS = credentials('docker-creds')
         IMAGE_TAG    = "${env.BRANCH_NAME ? env.BRANCH_NAME.replaceAll('/', '-') : 'main'}-${env.GIT_COMMIT ? env.GIT_COMMIT.take(7) : 'latest'}"
+        DOCKER_IMAGE_NAME = 'moudle8848/ansible-deploy'
     }
 
     stages {
