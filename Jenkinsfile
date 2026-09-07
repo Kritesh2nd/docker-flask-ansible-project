@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'ANSIBLE_CONTROLLER_IP', defaultValue: '', description: 'IP address of the Ansible controller')
+        string(name: 'ANSIBLE_CONTROLLER_IP', defaultValue: '172.31.87.63', description: 'IP address of the Ansible controller')
         string(name: 'ANSIBLE_CONTROLLER_USER', defaultValue: 'ubuntu', description: 'SSH user for Ansible controller')
     }
 
